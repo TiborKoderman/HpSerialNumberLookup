@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import configparser
 
 
 conn = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=C:\Users\kodermant\Documents\Python serial lookup\Inventar-automated.accdb;')
@@ -15,7 +16,8 @@ cursor.execute("SELECT * FROM Computers WHERE [Manufacturer] IN ('HP', 'Hewlett-
 for row in cursor.fetchall():
     SerialNumber = row.__getattribute__('Serial number')
     
-    driver = webdriver.Firefox()
+    #driver = webdriver.Firefox()
+    driver = webdriver.PhantomJS('phantomjs-2.1.1-windows\bin\phantomjs.exe')
     #open website
     driver.get('https://support.hp.com/si-en/checkwarranty')
 
@@ -62,7 +64,8 @@ for row in cursor.fetchall():
         cursor.execute("UPDATE Computers SET [PurchaseDate] = ?, [WarrantyExpiration] = ?, [ProductNumber] = ? WHERE [Serial number] = ?;", buyDate, expDate, ProductNumber, SerialNumber)
         cursor.commit()
     except:
-        pass
+        cursor.execute("UPDATE Computers SET [PurchaseDate] = ?, [WarrantyExpiration] = ?, [ProductNumber] = ? WHERE [Serial number] = ?;", 'January 1, 1111', 'January 1, 1111', '/', SerialNumber)
+        cursor.commit()
     driver.close()
 
     
