@@ -1,7 +1,0 @@
-dbPath=
-SerialColumn=
-prodNumColumn=
-buyDateColumn=
-expDateColumn=
-
-headless = True
