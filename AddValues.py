@@ -2,6 +2,7 @@ import pyodbc
 import selenium
 from Helpers import bColors as tc
 import Helpers
+from Helpers import Proxy
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -48,7 +49,7 @@ cursor = conn.cursor()
 cursor.execute(SelectString)
 
 
-
+PROXY = "173.192.128.238:9999"
 
 
 Helpers.ProgressBar.draw(0,totalRows, 100)
@@ -56,9 +57,17 @@ for row in cursor.fetchall():
 
     SerialNumber = row.__getattribute__(serialColumn)
     
-    
+    PROXY_HOST, PROXY_PORT = Proxy.GetRandomProxy("Proxy List.txt")
 
-    driver = webdriver.Firefox()
+    fp = webdriver.FirefoxProfile()
+
+    Proxy.setProxyFF(fp, PROXY_HOST, PROXY_PORT)
+
+    driver = webdriver.Firefox(firefox_profile=fp)
+
+
+
+
     #driver = webdriver.PhantomJS(r'phantomjs-2.1.1-windows\bin\phantomjs.exe')
     #open website
     driver.get('https://support.hp.com/'+countryCode+'-en/checkwarranty')
@@ -107,15 +116,9 @@ for row in cursor.fetchall():
             buyDate = buyDate_box.text
             expDate = expDate_box.text
 
-        #print("\rProduct number: "+ProductNumber)
-        #print("\rDate of purchase: " +buyDate)
-        #print("\rWarranty expires: " +expDate)
-
         sqlSuccess = "UPDATE "+tableName+" SET ["+buyDateColumn+"] = '"+ buyDate+"', ["+expDateColumn+"] = '" +expDate+ "', ["+prodNumColumn+"] = '" + ProductNumber+"' WHERE ["+serialColumn+"] ='"+SerialNumber+"';"
         
         
-
-        #cursor.execute("UPDATE Computers SET [PurchaseDate] = ?, [WarrantyExpiration] = ?, [ProductNumber] = ? WHERE [Serial number] = ?;", buyDate, expDate, ProductNumber, SerialNumber)
         cursor.execute(sqlSuccess)
         cursor.commit()
         status = tc.OKGREEN+"[OK]"+ tc.OKBLUE+" ["+SerialNumber+"] " + tc.ENDC+ "succsess                                                                  "
