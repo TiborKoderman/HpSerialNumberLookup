@@ -9,8 +9,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import configparser
 
-from collections import deque
-
 config = configparser.ConfigParser()
 config.read("config.ini")
 
@@ -21,6 +19,7 @@ expDateColumn = config.get('Config', 'expDateColumn')
 prodNumColumn = config.get('Config', 'prodNumColumn')
 serialColumn = config.get('Config', 'serialColumn')
 tableName = config.get('Config', 'tableName')
+countryCode = config.get('Config', 'countryCode')
 
 print(tc.OKGREEN + "SETTINGS:" +tc.ENDC)
 
@@ -62,7 +61,7 @@ for row in cursor.fetchall():
     driver = webdriver.Firefox()
     #driver = webdriver.PhantomJS(r'phantomjs-2.1.1-windows\bin\phantomjs.exe')
     #open website
-    driver.get('https://support.hp.com/si-en/checkwarranty')
+    driver.get('https://support.hp.com/'+countryCode+'-en/checkwarranty')
 
 
 
