@@ -2,6 +2,7 @@ import pyodbc
 import selenium
 from Helpers import bColors as tc
 import Helpers
+
 from Helpers import Proxy
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -21,6 +22,7 @@ prodNumColumn = config.get('Config', 'prodNumColumn')
 serialColumn = config.get('Config', 'serialColumn')
 tableName = config.get('Config', 'tableName')
 countryCode = config.get('Config', 'countryCode')
+useProxy = config.get('Config', 'useProxy')
 
 print(tc.OKGREEN + "SETTINGS:" +tc.ENDC)
 
@@ -48,23 +50,21 @@ cursor = conn.cursor()
 #cursor.execute("SELECT * FROM Computers WHERE [?] IN (?) AND ([?] IS NULL OR [?] IS NULL OR [?] IS NULL);",manufacturerColumn,hpPcNames,expDateColumn,prodNumColumn)
 cursor.execute(SelectString)
 
-
-PROXY = "173.192.128.238:9999"
-
-
 Helpers.ProgressBar.draw(0,totalRows, 100)
 for row in cursor.fetchall():
 
     SerialNumber = row.__getattribute__(serialColumn)
     
-    PROXY_HOST, PROXY_PORT = Proxy.GetRandomProxy("Proxy List.txt")
+    if useProxy == True:
+        PROXY_HOST, PROXY_PORT = Proxy.GetRandomProxy("Proxy List.txt")
 
-    fp = webdriver.FirefoxProfile()
+        fp = webdriver.FirefoxProfile()
 
-    Proxy.setProxyFF(fp, PROXY_HOST, PROXY_PORT)
+        Proxy.setProxyFF(fp, PROXY_HOST, PROXY_PORT)
 
-    driver = webdriver.Firefox(firefox_profile=fp)
-
+        driver = webdriver.Firefox(firefox_profile=fp)
+    else:
+        driver = webdriver.Firefox()
 
 
 
